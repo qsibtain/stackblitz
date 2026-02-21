@@ -118,7 +118,6 @@ import { useState } from "react";
 
     const steadyRow = rows[rows.length - 1];
     const steadySpend = steadyRow ? steadyRow.S : 0;
-    const steadyOk = true;
     const steadyCentral = centralAllowance(2032);
 
     const steadyAccelEmps = 4 * a * 1.5;
