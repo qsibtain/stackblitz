@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+  // Version 1.0
   const M = (v: number) => `$${v.toFixed(2)}M`;
   const K = (v: number) => `$${v}K`;
 
@@ -107,7 +108,7 @@ import { useState } from "react";
       const clawAmt = normalClawback ? Math.max(0, B - X - Y) : (firstYearClawback ? Math.max(0, 4.70 - Xp - S) : 0);
 
       rows.push({ yr, A, B, maxSpend, sSeed, sAccel, sIncub, sStartup, sCentral, S, X, Y, Ap, Xp, ok, clawback, clawAmt });
-      A = Ap;
+      A = Math.max(0,Ap);
       X = Xp;
     }
 
@@ -117,7 +118,7 @@ import { useState } from "react";
 
     const steadyRow = rows[rows.length - 1];
     const steadySpend = steadyRow ? steadyRow.S : 0;
-    const steadyOk = steadySpend <= 5.0 + 0.001;
+    const steadyOk = true;
     const steadyCentral = centralAllowance(2032);
 
     const steadyAccelEmps = 4 * a * 1.5;
@@ -149,7 +150,7 @@ import { useState } from "react";
             <div>Central allowance: <strong>$8K/emp/yr + $30K/1-in-10 emp/yr </strong></div>
             <div>Accelerator: <strong>$450K/3yr</strong>, new cohort Jul 1 each year</div>
             <div>Incubator: <strong>$150K/3yr</strong>, new cohort Jan 1 each year (from 2027)</div>
-            <div>Steady state spend: <strong>{M(steadySpend)}</strong>/yr {steadyOk ? "✅" : "❌ exceeds $5M"}</div>
+            <div>Steady state spend: <strong>{M(steadySpend)}</strong>/yr (budget: $5M + any accrual)</div>
             <div>Steady state employees: <strong>{steadyTotalEmps}</strong> ({steadyAccelEmps} accel + {steadyIncubEmps} incub)</div>
           </div>
         </div>
@@ -187,11 +188,8 @@ import { useState } from "react";
             Fixed annual: <strong>{M(fixedAnnual)}</strong> (capital + UG) | Start-ups: <strong>$150K/yr</strong> (3 x $50K) | Central allowance (steady):
   <strong>{M(steadyCentral)}</strong>
           </div>
-          <div className={`rounded-lg p-2 text-center text-sm font-semibold ${allOk && noClawback && steadyOk ? "bg-green-100 text-green-800" : allOk && steadyOk ?
-   "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
-            {!steadyOk
-              ? `❌ Steady-state spend (${M(steadySpend)}) exceeds $5M budget`
-              : !allOk
+           <div className={`rounded-lg p-2 text-center text-sm font-semibold ${allOk && noClawback ? "bg-green-100 text-green-800" : allOk ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
+              {!allOk
               ? `❌ Spending exceeds available funds in ${bindingYear?.yr}`
               : noClawback
               ? "✅ All constraints satisfied — this combination is sustainable!"
@@ -199,19 +197,10 @@ import { useState } from "react";
           </div>
         </div>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
-          <h3 className="font-semibold text-sm mb-2">Maximum Feasible Combinations</h3>
-          <p className="text-xs text-gray-500 mb-1">Steady state constraint: annual spend ≤ $5M after all fixed costs, start-ups, and central allowance</p>
-          <p className="text-xs text-gray-500 mb-1">Central allowance scales with projects: {steadyTotalEmps} employees at steady state → {M(steadyCentral)}/yr</p>
-          <p className="text-xs text-gray-500">Early years (2026–2028) are tightest due to SEED spending and budget ramp-up. In 2026 (zero budget), X' + S must be
-  ≥ $4.70M to avoid clawback.</p>
-        </div>
-
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mb-4">
           <strong>Key insight:</strong> At steady state you have <strong>{a * 4} active accelerator awards</strong> ({4} cohorts x {a}), <strong>{b * 3} active
   incubator awards</strong> ({3} cohorts x {b}), and <strong>6 start-up awards</strong> (2 cohorts x 3). Annual spend: {K(capital)} (capital) + {K(ugResearch)} (UG
-   research) + $150K (start-ups) + ${(0.45 * a * 1000).toFixed(0)}K (accel) + ${(0.15 * b * 1000).toFixed(0)}K (incub) + {M(steadyCentral)} (central allowance for
-  {steadyTotalEmps} employees) = <strong>{M(steadySpend)}</strong>. This must stay under the $5M annual budget.
+   research) + $150K (start-ups) + ${(0.45 * a * 1000).toFixed(0)}K (accel) + ${(0.15 * b * 1000).toFixed(0)}K (incub) + {M(steadyCentral)} (central allowance for {steadyTotalEmps} employees) = <strong>{M(steadySpend)}</strong>. This must stay under the $5M annual budget + any accrual.
         </div>
 
         <div className="overflow-x-auto mb-4">
